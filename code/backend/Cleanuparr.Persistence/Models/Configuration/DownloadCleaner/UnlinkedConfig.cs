@@ -4,7 +4,7 @@ using ValidationException = Cleanuparr.Domain.Exceptions.ValidationException;
 
 namespace Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 
-public sealed record UnlinkedConfig : IConfig
+public sealed record UnlinkedConfig : IConfig, ITagFilterable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,6 +23,16 @@ public sealed record UnlinkedConfig : IConfig
     public List<string> IgnoredRootDirs { get; set; } = [];
 
     public List<string> Categories { get; set; } = [];
+
+    /// <summary>
+    /// Torrent must have at least one of these tags/labels. Empty = no tag filter.
+    /// </summary>
+    public List<string> TagsAny { get; set; } = [];
+
+    /// <summary>
+    /// Torrent must have ALL of these tags/labels. Empty = no tag filter.
+    /// </summary>
+    public List<string> TagsAll { get; set; } = [];
 
     public void Validate()
     {
@@ -49,6 +59,11 @@ public sealed record UnlinkedConfig : IConfig
         if (Categories.Any(string.IsNullOrWhiteSpace))
         {
             throw new ValidationException("Empty unlinked category filter found");
+        }
+
+        if (TagsAny.Any(string.IsNullOrWhiteSpace) || TagsAll.Any(string.IsNullOrWhiteSpace))
+        {
+            throw new ValidationException("Empty unlinked tag filter found");
         }
 
         foreach (var dir in IgnoredRootDirs.Where(d => !string.IsNullOrEmpty(d)))

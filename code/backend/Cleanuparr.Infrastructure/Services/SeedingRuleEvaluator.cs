@@ -1,5 +1,6 @@
 using Cleanuparr.Domain.Entities;
 using Cleanuparr.Domain.Enums;
+using Cleanuparr.Infrastructure.Extensions;
 using Cleanuparr.Infrastructure.Services.Interfaces;
 using Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 
@@ -36,19 +37,9 @@ public class SeedingRuleEvaluator : ISeedingRuleEvaluator
         }
 
         // Tag/label check
-        if (rule is ITagFilterable tagFilterable)
+        if (rule is ITagFilterable tagFilterable && !tagFilterable.MatchesTags(torrent.Tags))
         {
-            if (tagFilterable.TagsAny.Count > 0 &&
-                !tagFilterable.TagsAny.Any(t => torrent.Tags.Contains(t, StringComparer.OrdinalIgnoreCase)))
-            {
-                return false;
-            }
-
-            if (tagFilterable.TagsAll.Count > 0 &&
-                !tagFilterable.TagsAll.All(t => torrent.Tags.Contains(t, StringComparer.OrdinalIgnoreCase)))
-            {
-                return false;
-            }
+            return false;
         }
 
         // Privacy check

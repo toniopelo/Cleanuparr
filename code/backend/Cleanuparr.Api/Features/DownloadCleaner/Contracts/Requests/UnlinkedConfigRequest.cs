@@ -11,4 +11,8 @@ public sealed record UnlinkedConfigRequest
     public List<string> IgnoredRootDirs { get; init; } = [];
 
     public List<string> Categories { get; init; } = [];
+
+    public List<string> TagsAny { get; init; } = [];
+
+    public List<string> TagsAll { get; init; } = [];
 }

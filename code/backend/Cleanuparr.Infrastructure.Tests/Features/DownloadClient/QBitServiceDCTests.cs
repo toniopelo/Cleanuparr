@@ -737,6 +737,48 @@ public class QBitServiceDCTests : IClassFixture<QBitServiceFixture>
             result.ShouldNotBeNull();
             result.ShouldBeEmpty();
         }
+
+        [Fact]
+        public void FiltersByTagsAny_WhenTagMatches()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash1", Category = "movies", Tags = new[] { "radarr-imported" } }, Array.Empty<TorrentTracker>(), false),
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash2", Category = "movies", Tags = new[] { "other" } }, Array.Empty<TorrentTracker>(), false)
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash1");
+        }
+
+        [Fact]
+        public void ReturnsEmpty_WhenTagsDoNotMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash1", Category = "movies", Tags = new[] { "other" } }, Array.Empty<TorrentTracker>(), false)
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldBeEmpty();
+        }
     }
 
     public class CreateCategoryAsync_Tests : QBitServiceDCTests

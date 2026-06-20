@@ -29,6 +29,14 @@ public sealed class UnlinkedConfigTests
     }
 
     [Fact]
+    public void Defaults_TagFiltersAreEmpty()
+    {
+        var config = new UnlinkedConfig();
+        config.TagsAny.ShouldBeEmpty();
+        config.TagsAll.ShouldBeEmpty();
+    }
+
+    [Fact]
     public void Validate_WhenDisabled_DoesNotThrow()
     {
         var config = new UnlinkedConfig
@@ -108,6 +116,21 @@ public sealed class UnlinkedConfigTests
 
         var exception = Should.Throw<ValidationException>(() => config.Validate());
         exception.Message.ShouldBe("Empty unlinked category filter found");
+    }
+
+    [Fact]
+    public void Validate_WhenEnabled_WithEmptyTagEntry_ThrowsValidationException()
+    {
+        var config = new UnlinkedConfig
+        {
+            Enabled = true,
+            TargetCategory = "cleanuparr-unlinked",
+            Categories = ["movies"],
+            TagsAny = ["radarr-imported", ""]
+        };
+
+        var exception = Should.Throw<ValidationException>(() => config.Validate());
+        exception.Message.ShouldBe("Empty unlinked tag filter found");
     }
 
     [Fact]

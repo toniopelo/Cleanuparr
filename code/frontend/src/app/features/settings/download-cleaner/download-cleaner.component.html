@@ -193,6 +193,18 @@
                     hint="Categories to check for unlinked downloads"
                     [error]="unlinkedCategoriesError()"
                     helpKey="download-cleaner:unlinkedCategories" />
+                  @if (isTagFilterableClient()) {
+                    <app-chip-input [label]="isSelectedClientTransmission() ? 'Unlinked Labels (Any)' : 'Unlinked Tags (Any)'" [placeholder]="isSelectedClientTransmission() ? 'Add label...' : 'Add tag...'"
+                      [items]="client.unlinkedConfig?.tagsAny ?? []"
+                      (itemsChange)="updateUnlinkedField('tagsAny', $event)"
+                      [hint]="isSelectedClientTransmission() ? 'Torrent must have at least one of these labels. Empty means any labels.' : 'Torrent must have at least one of these tags. Empty means any tags.'"
+                      helpKey="download-cleaner:unlinkedTagsAny" />
+                    <app-chip-input [label]="isSelectedClientTransmission() ? 'Unlinked Labels (All)' : 'Unlinked Tags (All)'" [placeholder]="isSelectedClientTransmission() ? 'Add label...' : 'Add tag...'"
+                      [items]="client.unlinkedConfig?.tagsAll ?? []"
+                      (itemsChange)="updateUnlinkedField('tagsAll', $event)"
+                      [hint]="isSelectedClientTransmission() ? 'Torrent must have all of these labels. Empty means any labels.' : 'Torrent must have all of these tags. Empty means any tags.'"
+                      helpKey="download-cleaner:unlinkedTagsAll" />
+                  }
                 }
                 <div class="form-actions">
                   <app-button variant="primary" [glowing]="unlinkedDirty()" [loading]="unlinkedSaving()" [disabled]="unlinkedSaving() || unlinkedSaved() || !unlinkedDirty() || !!unlinkedCategoriesError()" (clicked)="saveUnlinkedConfig()">
