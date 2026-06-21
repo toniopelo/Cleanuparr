@@ -48,11 +48,11 @@ public class WindowsHardLinkFileService : IWindowsHardLinkFileService, IDisposab
             }
             else
             {
-                linksInIgnoredDir = 1; // default to 1 if not found
+                linksInIgnoredDir = 0;
                 _logger.LogDebug("stat file | hardlinks: {links} | ignored: {ignored} | {file}", file.NumberOfLinks, linksInIgnoredDir, filePath);
             }
 
-            return file.NumberOfLinks - linksInIgnoredDir;
+            return Math.Max(0, (long)file.NumberOfLinks - linksInIgnoredDir - 1);
         }
         catch (Exception exception)
         {

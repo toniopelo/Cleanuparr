@@ -42,11 +42,11 @@ public class UnixHardLinkFileService : IUnixHardLinkFileService, IDisposable
             }
             else
             {
-                linksInIgnoredDir = 1; // default to 1 if not found
+                linksInIgnoredDir = 0;
                 _logger.LogDebug("stat file | hardlinks: {nlink} | ignored: {ignored} | {file}", stat.st_nlink, linksInIgnoredDir, filePath);
             }
 
-            return (long)stat.st_nlink - linksInIgnoredDir;
+            return Math.Max(0, (long)stat.st_nlink - linksInIgnoredDir - 1);
         }
         catch (Exception exception)
         {
