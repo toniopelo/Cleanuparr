@@ -84,7 +84,7 @@ public sealed class DownloadCleanerConfigController : ControllerBase
                     DownloadClientEnabled = client.Enabled,
                     DownloadClientTypeName = client.TypeName,
                     SeedingRules = seedingRules.Select(SeedingRuleResponse.From).ToList(),
-                    UnlinkedConfig = unlinkedConfig is not null ? UnlinkedConfigResponse.From(unlinkedConfig) : null,
+                    UnlinkedConfig = unlinkedConfig is not null ? UnlinkedConfigResponse.From(unlinkedConfig, client.TypeName) : null,
                     DeadTorrentConfig = deadTorrentConfig is not null ? DeadTorrentConfigResponse.From(deadTorrentConfig) : null,
                     OrphanedFilesConfig = orphanedFilesConfig is not null ? OrphanedFilesConfigResponse.From(orphanedFilesConfig) : null,
                 });

@@ -1,5 +1,6 @@
 using Cleanuparr.Domain.Entities;
 using Cleanuparr.Domain.Enums;
+using Cleanuparr.Infrastructure.Extensions;
 using Cleanuparr.Infrastructure.Features.Context;
 using Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 using Cleanuparr.Shared.Helpers;
@@ -61,6 +62,7 @@ public partial class QBitService
         return downloads
             ?.Where(x => !string.IsNullOrEmpty(x.Hash))
             .Where(x => unlinkedConfig.Categories.Any(cat => cat.Equals(x.Category, StringComparison.InvariantCultureIgnoreCase)))
+            .Where(x => unlinkedConfig.MatchesTags(x.Tags))
             .Where(x =>
             {
                 if (unlinkedConfig.UseTag && x is QBitItemWrapper qBitItemWrapper)

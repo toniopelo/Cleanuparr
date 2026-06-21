@@ -22,6 +22,8 @@ export interface UnlinkedConfigModel {
   useTag: boolean;
   ignoredRootDirs: string[];
   categories: string[];
+  tagsAny: string[];
+  tagsAll: string[];
 }
 
 export interface DeadTorrentConfigModel {
@@ -84,6 +86,8 @@ export function createDefaultUnlinkedConfig(): UnlinkedConfigModel {
     useTag: false,
     ignoredRootDirs: [],
     categories: [],
+    tagsAny: [],
+    tagsAll: [],
   };
 }
 

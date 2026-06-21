@@ -29,6 +29,14 @@ public sealed class UnlinkedConfigTests
     }
 
     [Fact]
+    public void Defaults_TagFiltersAreEmpty()
+    {
+        var config = new UnlinkedConfig();
+        config.TagsAny.ShouldBeEmpty();
+        config.TagsAll.ShouldBeEmpty();
+    }
+
+    [Fact]
     public void Validate_WhenDisabled_DoesNotThrow()
     {
         var config = new UnlinkedConfig

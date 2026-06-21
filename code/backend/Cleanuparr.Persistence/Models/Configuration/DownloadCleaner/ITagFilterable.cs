@@ -1,8 +1,8 @@
 namespace Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 
 /// <summary>
-/// Marks a seeding rule as supporting tag/label-based filtering.
-/// Implemented by clients that expose per-torrent tags: qBittorrent (tags) and Transmission (labels).
+/// Marks a configuration object as supporting tag/label-based filtering.
+/// Used for clients that expose per-torrent tags: qBittorrent (tags) and Transmission (labels).
 /// </summary>
 public interface ITagFilterable
 {

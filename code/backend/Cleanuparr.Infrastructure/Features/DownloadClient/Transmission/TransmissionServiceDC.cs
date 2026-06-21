@@ -44,6 +44,7 @@ public partial class TransmissionService
         return downloads
             ?.Where(x => !string.IsNullOrEmpty(x.Hash))
             .Where(x => unlinkedConfig.Categories.Any(cat => cat.Equals(x.Category, StringComparison.InvariantCultureIgnoreCase)))
+            .Where(x => unlinkedConfig.MatchesTags(x.Tags))
             .Where(x =>
             {
                 if (unlinkedConfig.UseTag)

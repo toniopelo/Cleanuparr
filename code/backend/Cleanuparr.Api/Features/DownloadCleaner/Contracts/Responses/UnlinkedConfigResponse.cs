@@ -1,3 +1,5 @@
+using Cleanuparr.Api.Features.DownloadCleaner;
+using Cleanuparr.Domain.Enums;
 using Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 
 namespace Cleanuparr.Api.Features.DownloadCleaner.Contracts.Responses;
@@ -14,12 +16,23 @@ public sealed record UnlinkedConfigResponse
 
     public required List<string> Categories { get; init; }
 
-    public static UnlinkedConfigResponse From(UnlinkedConfig config) => new()
+    public required List<string> TagsAny { get; init; }
+
+    public required List<string> TagsAll { get; init; }
+
+    public static UnlinkedConfigResponse From(UnlinkedConfig config, DownloadClientTypeName typeName)
     {
-        Enabled = config.Enabled,
-        TargetCategory = config.TargetCategory,
-        UseTag = config.UseTag,
-        IgnoredRootDirs = config.IgnoredRootDirs,
-        Categories = config.Categories,
-    };
+        bool supportsTagFilters = DownloadCleanerClientCapabilities.SupportsTagFilters(typeName);
+
+        return new UnlinkedConfigResponse
+        {
+            Enabled = config.Enabled,
+            TargetCategory = config.TargetCategory,
+            UseTag = config.UseTag,
+            IgnoredRootDirs = config.IgnoredRootDirs,
+            Categories = config.Categories,
+            TagsAny = supportsTagFilters ? config.TagsAny : [],
+            TagsAll = supportsTagFilters ? config.TagsAll : [],
+        };
+    }
 }

@@ -90,6 +90,8 @@ export class DocumentationService {
       'downloadDirectoryTarget': 'download-directory-source-and-local-directory-target',
       'unlinkedIgnoredRootDir': 'ignored-root-directory',
       'unlinkedCategories': 'unlinked-categories',
+      'unlinkedTagsAny': 'unlinked-tags-any',
+      'unlinkedTagsAll': 'unlinked-tags-all',
       'deadTorrentEnabled': 'enable-dead-torrent',
       'deadTorrentTargetCategory': 'dead-torrent-target-category',
       'deadTorrentUseTag': 'dead-torrent-use-tag',

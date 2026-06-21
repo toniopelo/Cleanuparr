@@ -1,4 +1,5 @@
 using Cleanuparr.Api.Extensions;
+using Cleanuparr.Api.Features.DownloadCleaner;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Requests;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Responses;
 using Cleanuparr.Persistence;
@@ -45,7 +46,7 @@ public class UnlinkedConfigController : ControllerBase
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.DownloadClientConfigId == downloadClientId);
 
-            return Ok(config is null ? null : UnlinkedConfigResponse.From(config));
+            return Ok(config is null ? null : UnlinkedConfigResponse.From(config, client.TypeName));
         }
         finally
         {
@@ -86,17 +87,29 @@ public class UnlinkedConfigController : ControllerBase
             existing.IgnoredRootDirs = dto.IgnoredRootDirs;
             existing.Categories = dto.Categories;
 
+            if (DownloadCleanerClientCapabilities.SupportsTagFilters(client.TypeName))
+            {
+                existing.TagsAny = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAny);
+                existing.TagsAll = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAll);
+            }
+            else
+            {
+                existing.TagsAny = [];
+                existing.TagsAll = [];
+            }
+
             existing.Validate();
 
             await _dataContext.SaveChangesAsync();
 
             _logger.LogInformation("Updated unlinked config for client {ClientId}", downloadClientId);
 
-            return Ok(UnlinkedConfigResponse.From(existing));
+            return Ok(UnlinkedConfigResponse.From(existing, client.TypeName));
         }
         finally
         {
             DataContext.Lock.Release();
         }
     }
+
 }

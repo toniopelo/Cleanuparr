@@ -367,6 +367,92 @@ public class TransmissionServiceDCTests : IClassFixture<TransmissionServiceFixtu
         }
 
         [Fact]
+        public void FiltersByTagsAny_WhenAnyLabelMatches()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash1", DownloadDir = "/downloads/movies", Labels = ["radarr-imported"] }),
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash2", DownloadDir = "/downloads/movies", Labels = ["other"] })
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported", "sonarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash1");
+        }
+
+        [Fact]
+        public void FiltersByTagsAll_WhenAllLabelsMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash1", DownloadDir = "/downloads/movies", Labels = ["radarr-imported", "arr-imported"] }),
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash2", DownloadDir = "/downloads/movies", Labels = ["radarr-imported"] })
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAll = ["radarr-imported", "arr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash1");
+        }
+
+        [Fact]
+        public void RequiresCategoryAndTagFiltersToMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash1", DownloadDir = "/downloads/tv", Labels = ["radarr-imported"] }),
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash2", DownloadDir = "/downloads/movies", Labels = ["radarr-imported"] })
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash2");
+        }
+
+        [Fact]
+        public void ReturnsEmpty_WhenTagsDoNotMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new TransmissionItemWrapper(new TorrentInfo { HashString = "hash1", DownloadDir = "/downloads/movies", Labels = ["other"] })
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldBeEmpty();
+        }
+
+        [Fact]
         public void ExcludesAlreadyLabeled_WhenUseTag()
         {
             // Arrange
