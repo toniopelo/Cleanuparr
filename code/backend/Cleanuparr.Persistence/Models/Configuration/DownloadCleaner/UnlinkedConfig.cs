@@ -61,11 +61,6 @@ public sealed record UnlinkedConfig : IConfig, ITagFilterable
             throw new ValidationException("Empty unlinked category filter found");
         }
 
-        if (TagsAny.Any(string.IsNullOrWhiteSpace) || TagsAll.Any(string.IsNullOrWhiteSpace))
-        {
-            throw new ValidationException("Empty unlinked tag filter found");
-        }
-
         foreach (var dir in IgnoredRootDirs.Where(d => !string.IsNullOrEmpty(d)))
         {
             if (!Directory.Exists(dir))

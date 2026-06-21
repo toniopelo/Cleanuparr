@@ -761,6 +761,50 @@ public class QBitServiceDCTests : IClassFixture<QBitServiceFixture>
         }
 
         [Fact]
+        public void FiltersByTagsAll_WhenAllTagsMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash1", Category = "movies", Tags = new[] { "radarr-imported", "arr-imported" } }, Array.Empty<TorrentTracker>(), false),
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash2", Category = "movies", Tags = new[] { "radarr-imported" } }, Array.Empty<TorrentTracker>(), false)
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAll = ["radarr-imported", "arr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash1");
+        }
+
+        [Fact]
+        public void RequiresCategoryAndTagFiltersToMatch()
+        {
+            // Arrange
+            var sut = _fixture.CreateSut();
+
+            var downloads = new List<Domain.Entities.ITorrentItemWrapper>
+            {
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash1", Category = "tv", Tags = new[] { "radarr-imported" } }, Array.Empty<TorrentTracker>(), false),
+                new QBitItemWrapper(new TorrentInfo { Hash = "hash2", Category = "movies", Tags = new[] { "radarr-imported" } }, Array.Empty<TorrentTracker>(), false)
+            };
+
+            // Act
+            var result = sut.FilterDownloadsToChangeCategoryAsync(downloads,
+                new UnlinkedConfig { Categories = ["movies"], TagsAny = ["radarr-imported"] });
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldHaveSingleItem();
+            result[0].Hash.ShouldBe("hash2");
+        }
+
+        [Fact]
         public void ReturnsEmpty_WhenTagsDoNotMatch()
         {
             // Arrange

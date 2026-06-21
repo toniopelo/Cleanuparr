@@ -1,3 +1,4 @@
+using Cleanuparr.Api.Features.DownloadCleaner;
 using Cleanuparr.Domain.Enums;
 using Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 
@@ -21,7 +22,7 @@ public sealed record UnlinkedConfigResponse
 
     public static UnlinkedConfigResponse From(UnlinkedConfig config, DownloadClientTypeName typeName)
     {
-        bool supportsTagFilters = SupportsTagFilters(typeName);
+        bool supportsTagFilters = DownloadCleanerClientCapabilities.SupportsTagFilters(typeName);
 
         return new UnlinkedConfigResponse
         {
@@ -34,7 +35,4 @@ public sealed record UnlinkedConfigResponse
             TagsAll = supportsTagFilters ? config.TagsAll : [],
         };
     }
-
-    private static bool SupportsTagFilters(DownloadClientTypeName typeName)
-        => typeName is DownloadClientTypeName.qBittorrent or DownloadClientTypeName.Transmission;
 }

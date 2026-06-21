@@ -1,7 +1,7 @@
 using Cleanuparr.Api.Extensions;
+using Cleanuparr.Api.Features.DownloadCleaner;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Requests;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Responses;
-using Cleanuparr.Domain.Enums;
 using Cleanuparr.Persistence;
 using Cleanuparr.Persistence.Models.Configuration.DownloadCleaner;
 using Microsoft.AspNetCore.Authorization;
@@ -87,10 +87,10 @@ public class UnlinkedConfigController : ControllerBase
             existing.IgnoredRootDirs = dto.IgnoredRootDirs;
             existing.Categories = dto.Categories;
 
-            if (SupportsTagFilters(client.TypeName))
+            if (DownloadCleanerClientCapabilities.SupportsTagFilters(client.TypeName))
             {
-                existing.TagsAny = SanitizeStringList(dto.TagsAny);
-                existing.TagsAll = SanitizeStringList(dto.TagsAll);
+                existing.TagsAny = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAny);
+                existing.TagsAll = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAll);
             }
             else
             {
@@ -112,9 +112,4 @@ public class UnlinkedConfigController : ControllerBase
         }
     }
 
-    private static List<string> SanitizeStringList(List<string> list)
-        => list.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
-
-    private static bool SupportsTagFilters(DownloadClientTypeName typeName)
-        => typeName is DownloadClientTypeName.qBittorrent or DownloadClientTypeName.Transmission;
 }

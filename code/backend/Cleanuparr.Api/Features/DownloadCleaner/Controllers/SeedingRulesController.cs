@@ -1,4 +1,5 @@
 using Cleanuparr.Api.Extensions;
+using Cleanuparr.Api.Features.DownloadCleaner;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Requests;
 using Cleanuparr.Api.Features.DownloadCleaner.Contracts.Responses;
 using Cleanuparr.Domain.Enums;
@@ -108,8 +109,8 @@ public class SeedingRulesController : ControllerBase
             }
 
             existingRule.Name = ruleDto.Name.Trim();
-            existingRule.Categories = SanitizeStringList(ruleDto.Categories);
-            existingRule.TrackerPatterns = SanitizeStringList(ruleDto.TrackerPatterns);
+            existingRule.Categories = DownloadCleanerRequestSanitizer.SanitizeStringList(ruleDto.Categories);
+            existingRule.TrackerPatterns = DownloadCleanerRequestSanitizer.SanitizeStringList(ruleDto.TrackerPatterns);
             existingRule.PrivacyType = ruleDto.PrivacyType;
             existingRule.MaxRatio = ruleDto.MaxRatio;
             existingRule.MinSeedTime = ruleDto.MinSeedTime;
@@ -119,8 +120,8 @@ public class SeedingRulesController : ControllerBase
 
             if (existingRule is ITagFilterable tagFilterable)
             {
-                tagFilterable.TagsAny = SanitizeStringList(ruleDto.TagsAny);
-                tagFilterable.TagsAll = SanitizeStringList(ruleDto.TagsAll);
+                tagFilterable.TagsAny = DownloadCleanerRequestSanitizer.SanitizeStringList(ruleDto.TagsAny);
+                tagFilterable.TagsAll = DownloadCleanerRequestSanitizer.SanitizeStringList(ruleDto.TagsAll);
             }
 
             if (existingRule is ISeedersFilterable seedersFilterable)
@@ -220,15 +221,12 @@ public class SeedingRulesController : ControllerBase
         }
     }
 
-    private static List<string> SanitizeStringList(List<string> list)
-        => list.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
-
     private static ISeedingRule CreateRule(DownloadClientTypeName typeName, Guid clientId, SeedingRuleRequest dto, int priority)
     {
-        var categories = SanitizeStringList(dto.Categories);
-        var trackerPatterns = SanitizeStringList(dto.TrackerPatterns);
-        var tagsAny = SanitizeStringList(dto.TagsAny);
-        var tagsAll = SanitizeStringList(dto.TagsAll);
+        var categories = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.Categories);
+        var trackerPatterns = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TrackerPatterns);
+        var tagsAny = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAny);
+        var tagsAll = DownloadCleanerRequestSanitizer.SanitizeStringList(dto.TagsAll);
 
         return typeName switch
         {

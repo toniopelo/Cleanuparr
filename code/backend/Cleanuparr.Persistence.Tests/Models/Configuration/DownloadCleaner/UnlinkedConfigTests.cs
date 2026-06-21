@@ -119,21 +119,6 @@ public sealed class UnlinkedConfigTests
     }
 
     [Fact]
-    public void Validate_WhenEnabled_WithEmptyTagEntry_ThrowsValidationException()
-    {
-        var config = new UnlinkedConfig
-        {
-            Enabled = true,
-            TargetCategory = "cleanuparr-unlinked",
-            Categories = ["movies"],
-            TagsAny = ["radarr-imported", ""]
-        };
-
-        var exception = Should.Throw<ValidationException>(() => config.Validate());
-        exception.Message.ShouldBe("Empty unlinked tag filter found");
-    }
-
-    [Fact]
     public void Validate_WhenEnabled_WithNonExistentIgnoredRootDir_ThrowsValidationException()
     {
         var config = new UnlinkedConfig
